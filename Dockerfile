@@ -3,7 +3,7 @@ FROM python:3.8
 LABEL maintainer="synodriver"
 
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --no-cache-dir -r /tmp/requirements.txt -i https://pypi.org/simple
 
 #COPY ./start.sh /start.sh
 #RUN chmod +x /start.sh
