@@ -3,13 +3,14 @@ import time
 
 from fastapi import FastAPI, Request
 
-from .routers import nsfw, tag
+from .routers import nsfw, tag, tagv2
 
 app = FastAPI(title="Nginx Unit test", description="This will fail on unit")
 
 
 app.include_router(nsfw.router)
 app.include_router(tag.router)
+app.include_router(tagv2.router)
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
