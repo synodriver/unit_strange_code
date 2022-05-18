@@ -99,7 +99,7 @@ def predict(content: bytes):
         data = process_data(content)
         data = tf.expand_dims(data, 0)
         out = model(data)[0]
-    return dict((tags[i], out[i].numpy()) for i in range(len(tags)))
+    return {tags[i]: out[i].numpy() for i in range(len(tags))}
 
 
 def predict_file(file: BytesIO, limit: float):
@@ -109,5 +109,4 @@ def predict_file(file: BytesIO, limit: float):
     return dict(ret)
 
 
-if __name__ == '__main__':
-    pass
+pass

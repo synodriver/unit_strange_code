@@ -40,5 +40,4 @@ async def process_pic_url(url: str = Query(..., description="pic url"),
              response_class=UJSONResponse)
 def process_pic(data: UploadFile = File(..., description="pic"),
                 limit: float = Form(0.7, description="the threshold to output")):
-    ret = predict_file(data.file, limit)
-    return ret
+    return predict_file(data.file, limit)

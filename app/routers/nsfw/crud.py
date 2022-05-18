@@ -88,10 +88,9 @@ def load_img(file: IO, grayscale=False, color_mode='rgb', target_size=None,
         if img.size != width_height_tuple:
             if interpolation not in _PIL_INTERPOLATION_METHODS:
                 raise ValueError(
-                    'Invalid interpolation method {} specified. Supported '
-                    'methods are {}'.format(
-                        interpolation,
-                        ", ".join(_PIL_INTERPOLATION_METHODS.keys())))
+                    f'Invalid interpolation method {interpolation} specified. Supported methods are {", ".join(_PIL_INTERPOLATION_METHODS.keys())}'
+                )
+
             resample = _PIL_INTERPOLATION_METHODS[interpolation]
             img = img.resize(width_height_tuple, resample)
     return img
@@ -136,8 +135,7 @@ def classify(model,
              image_dim=IMAGE_DIM) -> Sequence[Dict]:
     """ Classify given a model, input paths (could be single string), and image dimensionality...."""
     images = load_images(input_files, (image_dim, image_dim))
-    probs = predict.classify_nd(model, images)
-    return probs
+    return predict.classify_nd(model, images)
 
 
 async def download_from_url(url: str) -> IO:

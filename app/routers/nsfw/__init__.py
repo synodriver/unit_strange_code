@@ -34,5 +34,4 @@ async def process_pic_url(urls: List[str] = Query(..., description="pic url"),
              response_model_exclude_none=True)
 def process_pic(data: UploadFile = File(..., description="pic"),
                 image_dim: int = Form(224, description="size")):
-    ret = classify(model, data.file, image_dim)
-    return ret
+    return classify(model, data.file, image_dim)
