@@ -1,15 +1,15 @@
-from typing import Union, List, Tuple, Sequence, Dict, IO
-import warnings
 import io
+import warnings
 from pathlib import Path
+from typing import IO, Dict, List, Sequence, Tuple, Union
 
-from tensorflow import keras
-import numpy as np
 import aiohttp
+import numpy as np
+from tensorflow import keras
 
 try:
-    from PIL import ImageEnhance
     from PIL import Image as pil_image
+    from PIL import ImageEnhance
 except ImportError:
     pil_image = None
     ImageEnhance = None
@@ -20,23 +20,28 @@ IMAGE_DIM = 224
 
 if pil_image is not None:
     _PIL_INTERPOLATION_METHODS = {
-        'nearest': pil_image.NEAREST,
-        'bilinear': pil_image.BILINEAR,
-        'bicubic': pil_image.BICUBIC,
+        "nearest": pil_image.NEAREST,
+        "bilinear": pil_image.BILINEAR,
+        "bicubic": pil_image.BICUBIC,
     }
     # These methods were only introduced in version 3.4.0 (2016).
-    if hasattr(pil_image, 'HAMMING'):
-        _PIL_INTERPOLATION_METHODS['hamming'] = pil_image.HAMMING
-    if hasattr(pil_image, 'BOX'):
-        _PIL_INTERPOLATION_METHODS['box'] = pil_image.BOX
+    if hasattr(pil_image, "HAMMING"):
+        _PIL_INTERPOLATION_METHODS["hamming"] = pil_image.HAMMING
+    if hasattr(pil_image, "BOX"):
+        _PIL_INTERPOLATION_METHODS["box"] = pil_image.BOX
     # This method is new in version 1.1.3 (2013).
-    if hasattr(pil_image, 'LANCZOS'):
-        _PIL_INTERPOLATION_METHODS['lanczos'] = pil_image.LANCZOS
-model = predict.load_model(str(Path(__file__).parent/'nsfw_mobilenet2.224x224.h5'))
+    if hasattr(pil_image, "LANCZOS"):
+        _PIL_INTERPOLATION_METHODS["lanczos"] = pil_image.LANCZOS
+model = predict.load_model(str(Path(__file__).parent / "nsfw_mobilenet2.224x224.h5"))
 
 
-def load_img(file: IO, grayscale=False, color_mode='rgb', target_size=None,
-             interpolation='nearest') -> pil_image.Image:
+def load_img(
+    file: IO,
+    grayscale=False,
+    color_mode="rgb",
+    target_size=None,
+    interpolation="nearest",
+) -> pil_image.Image:
     """Loads an image into PIL format.
 
     # Arguments
@@ -63,24 +68,24 @@ def load_img(file: IO, grayscale=False, color_mode='rgb', target_size=None,
         ValueError: if interpolation method is not supported.
     """
     if grayscale is True:
-        warnings.warn('grayscale is deprecated. Please use '
-                      'color_mode = "grayscale"')
-        color_mode = 'grayscale'
+        warnings.warn("grayscale is deprecated. Please use " 'color_mode = "grayscale"')
+        color_mode = "grayscale"
     if pil_image is None:
-        raise ImportError('Could not import PIL.Image. '
-                          'The use of `load_img` requires PIL.')
+        raise ImportError(
+            "Could not import PIL.Image. " "The use of `load_img` requires PIL."
+        )
     img = pil_image.open(file)
-    if color_mode == 'grayscale':
+    if color_mode == "grayscale":
         # if image is not already an 8-bit, 16-bit or 32-bit grayscale image
         # convert it to an 8-bit grayscale image.
-        if img.mode not in ('L', 'I;16', 'I'):
-            img = img.convert('L')
-    elif color_mode == 'rgba':
-        if img.mode != 'RGBA':
-            img = img.convert('RGBA')
-    elif color_mode == 'rgb':
-        if img.mode != 'RGB':
-            img = img.convert('RGB')
+        if img.mode not in ("L", "I;16", "I"):
+            img = img.convert("L")
+    elif color_mode == "rgba":
+        if img.mode != "RGBA":
+            img = img.convert("RGBA")
+    elif color_mode == "rgb":
+        if img.mode != "RGB":
+            img = img.convert("RGB")
     else:
         raise ValueError('color_mode must be "grayscale", "rgb", or "rgba"')
     if target_size is not None:
@@ -88,19 +93,20 @@ def load_img(file: IO, grayscale=False, color_mode='rgb', target_size=None,
         if img.size != width_height_tuple:
             if interpolation not in _PIL_INTERPOLATION_METHODS:
                 raise ValueError(
-                    'Invalid interpolation method {} specified. Supported '
-                    'methods are {}'.format(
-                        interpolation,
-                        ", ".join(_PIL_INTERPOLATION_METHODS.keys())))
+                    "Invalid interpolation method {} specified. Supported "
+                    "methods are {}".format(
+                        interpolation, ", ".join(_PIL_INTERPOLATION_METHODS.keys())
+                    )
+                )
             resample = _PIL_INTERPOLATION_METHODS[interpolation]
             img = img.resize(width_height_tuple, resample)
     return img
 
 
-def load_images(image_files: Union[IO, List[IO]],
-                image_size: Tuple[int, int],
-                verbose=True) -> np.ndarray:
-    '''
+def load_images(
+    image_files: Union[IO, List[IO]], image_size: Tuple[int, int], verbose=True
+) -> np.ndarray:
+    """
     Function for loading images into numpy arrays for passing to model.predict
     inputs:
         image_files: list of image paths to load
@@ -111,7 +117,7 @@ def load_images(image_files: Union[IO, List[IO]],
         loaded_images: loaded images on which keras model can run predictions
         loaded_image_indexes: paths of images which the function is able to process
 
-    '''
+    """
     loaded_images = []
 
     if not isinstance(image_files, list):
@@ -131,10 +137,10 @@ def load_images(image_files: Union[IO, List[IO]],
     return np.asarray(loaded_images)
 
 
-def classify(model,
-             input_files: Union[IO, List[IO]],
-             image_dim=IMAGE_DIM) -> Sequence[Dict]:
-    """ Classify given a model, input paths (could be single string), and image dimensionality...."""
+def classify(
+    model, input_files: Union[IO, List[IO]], image_dim=IMAGE_DIM
+) -> Sequence[Dict]:
+    """Classify given a model, input paths (could be single string), and image dimensionality...."""
     images = load_images(input_files, (image_dim, image_dim))
     probs = predict.classify_nd(model, images)
     return probs

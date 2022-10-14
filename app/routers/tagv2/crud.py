@@ -1,11 +1,10 @@
-import json
 from io import BytesIO
 from pathlib import Path
 
 import tensorflow as tf
 import tensorflow.keras as keras
 
-SIZE = 256
+SIZE = 224
 DEVICE = "/CPU:0"
 
 tags = [
@@ -496,18 +495,19 @@ with tf.device(DEVICE):
             keras.layers.Activation("sigmoid"),
         ]
     )
-    model.load_weights(str(Path(__file__).parent / "weights.27-1.3988.h5"))
+    model.load_weights(str(Path(__file__).parent / "weights.218-1.6841.h5"))
 
 
 @tf.function
 def process_data(content):
     img = tf.io.decode_jpeg(content, channels=3)
-    img = tf.image.resize_with_pad(img, SIZE, SIZE)
-    img = tf.image.per_image_standardization(img)
+    img = tf.image.resize_with_pad(img, SIZE, SIZE, method="nearest")
+    img = tf.image.resize(img, (SIZE, SIZE), method="nearest")
+    img = img / 255
     return img
 
 
-def predict(content: bytes):
+def predict(content):
     with tf.device(DEVICE):
         data = process_data(content)
         data = tf.expand_dims(data, 0)
@@ -523,4 +523,5 @@ def predict_file(file: BytesIO, limit: float):
 
 
 if __name__ == "__main__":
-    pass
+    with open(r"F:\jhc\TIM图片20200508215309.jpg", "rb") as file:
+        print(predict_file(file, 0.7))

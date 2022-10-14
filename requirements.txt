@@ -9,7 +9,7 @@ aiohttp
 aiodns
 numpy
 gunicorn
-nonecorn==0.13.1.dev1
+nonecorn==0.14.1.dev1
 pillow
 uvloop
 ujson

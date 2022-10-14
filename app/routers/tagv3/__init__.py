@@ -8,7 +8,7 @@ from fastapi.responses import UJSONResponse
 
 from .crud import predict_file
 
-router = APIRouter(prefix="/api/v2")
+router = APIRouter(prefix="/api/v3")
 
 
 async def download_from_url(url: str) -> IO:
